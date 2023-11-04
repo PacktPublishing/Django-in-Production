@@ -3,11 +3,10 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.throttling import  UserRateThrottle
+
 
 from blog import models
-from blog import serializers
-from pprint import pprint
+
 
 @api_view(['POST'])
 def create_blog(request):
