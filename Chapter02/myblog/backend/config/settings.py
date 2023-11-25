@@ -39,8 +39,8 @@ DJANGO_APPS = [
 ]
 
 CUSTOM_APPS = [
-    'author',
     'blog',
+    'author',
 ]
 
 THIRD_PARTY_APPS = [
@@ -86,11 +86,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': 'tiny.db.elephantsql.com',
-        'NAME': 'wjgroaiq',
-        'USER': 'wjgroaiq',
+        'HOST': 'cornelius.db.elephantsql.com',
+        'NAME': 'hvnvahvu',
+        'USER': 'hvnvahvu',
         'PORT': 5432,
-        'PASSWORD': 'RAiMEQaRUoVwPF4R_ZTwF22GRrGHgwpD',
+        'PASSWORD': 'sb7VX8H4p-YpkBMvt2h_4fu7EGunm2B-',
     }
 }
 
@@ -135,9 +135,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://default:JvmKuST0YjEiH2peqqKaUNXhkDBgChKG@redis-15014.c57.us-east-1-4.ec2.cloud.redislabs.com:15014',
-    }
-}

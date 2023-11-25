@@ -4,6 +4,8 @@
 * [Creating a "Hello World" web app with Django and DRF](#creating-a-hello-world-web-app-with-django-and-drf)
   * [Creating a virtual environment](#creating-a-virtual-environment)
   * [Installing Django](#installing-django)
+  * [Create a Django project](#create-a-django-project)
+  * [Integrating Django Rest Framework](#integrating-django-rest-framework)
 
 
 ## Creating a "Hello World" web app with Django and DRF
@@ -37,4 +39,11 @@ pip install Django==4.2
 mkdir hello_world && cd hello_world
 mkdir backend && cd backend
 django-admin startproject config .
+```
+
+### Integrating Django Rest Framework
+In order to install Django Rest Framework, we need to install it using pip in the activated virtual environment.
+
+```bash
+pip install djangorestframework
 ```
