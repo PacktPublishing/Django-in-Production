@@ -123,6 +123,132 @@ you can use the Django shell. You can start the Django shell using the following
 python manage.py shell
 ```
 
+## Understanding the crux of Django Migration
 
+### Performing DB migrations like a pro
+
+#### Use Fake migration
+
+In order to use fake migration, we need to create a db change that can be faked. For example, we can add a new field to the Author model.
+
+```python
+from django.db import models
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    demo_field = models.TextField(default='demo') # Uncomment this line to test fake migrations
+    email = models.EmailField(unique=True)
+    bio = models.TextField()
+
+    def __str__(self):
+        return self.name
+```
+
+now run the following commands:
 
 ```bash
+python manage.py makemigrations
+python manage.py migrate author 0002 --fake
+```
+We have now faked the migration. Now, if we run the migrate command again, it will not apply the migration.
+
+```bash
+python manage.py migrate
+```
+
+Now to revert the fake migrations 
+
+```bash
+python manage.py migrate author 0001 --fake
+```
+## Learning about Performance Optimization
+
+### Understanding Django ORM like a pro
+
+#### Using select_related and prefetch_related
+
+To understand the advantage of using select_related and prefetch_related, we need to understand the concept of database joins. And also how Django ORM works using the hood when we have multiple queries.
+
+First we need to create a decorator that we can use to measure the queries used when querying.
+
+```python
+from django.db import connection
+from django.db import reset_queries
+
+def database_debug(func):
+    def inner_func(*args, **kwargs):
+        reset_queries()
+        results = func()
+        query_info = connection.queries
+        print(f'function_name: {func.__name__}')
+        print(f'query_count: {len(query_info)}')
+        queries = [f'{ query["sql"]}\n' for query in query_info]
+        print(f'queries: \n{"".join(queries)}')
+        return results
+    return inner_func
+```
+
+Now we can use the decorator to measure the queries used when querying.
+
+```python
+from author import models
+
+@database_debug
+def regular_query():
+    blogs = models.Blog.objects.all()
+    return [blog.author.first_name for blog in blogs]
+
+regular_query()
+
+##################
+OUTPUT Result
+
+function_name: regular_query
+query_count: 4
+queries:
+SELECT "blog_blog"."id", "blog_blog"."title", "blog_blog"."content", "blog_blog"."author_id", "blog_blog"."created_at", "blog_blog"."updated_at" FROM "blog_blog"
+SELECT "author_author"."id", "author_author"."name", "author_author"."email", "author_author"."bio" FROM "author_author" WHERE "author_author"."id" = 1 LIMIT 21
+SELECT "author_author"."id", "author_author"."name", "author_author"."email", "author_author"."bio" FROM "author_author" WHERE "author_author"."id" = 2 LIMIT 21
+SELECT "author_author"."id", "author_author"."name", "author_author"."email", "author_author"."bio" FROM "author_author" WHERE "author_author"."id" = 2 LIMIT 21
+```
+
+Now we can use the decorator to measure the queries used when querying using select_related.
+
+```python
+@database_debug
+def select_related_query():
+    blogs = models.Blog.objects.select_related('author').all()
+    return [blog.author.name for blog in blogs]
+
+select_related_query()
+
+##################
+OUTPUT Result
+
+function_name: select_related_query
+query_count: 1
+queries:
+SELECT "blog_blog"."id", "blog_blog"."title", "blog_blog"."content", "blog_blog"."author_id", "blog_blog"."created_at", "blog_blog"."updated_at", "author_author"."id", "author_author"."name", "author_author"."email", "author_author"."bio" FROM "blog_blog" INNER JOIN "author_author" ON ("blog_blog"."author_id" = "author_author"."id")
+
+```
+
+Now we can use the decorator to measure the queries used when querying using prefetch_related.
+
+```python
+@database_debug
+def prefetch_related_query():
+    blogs = models.Blog.objects.prefetch_related('author').all()
+    return [blog.author.name for blog in blogs]
+
+prefetch_related_query()
+
+##################
+OUTPUT Result
+function_name: prefetch_related_query
+query_count: 2
+queries:
+SELECT "blog_blog"."id", "blog_blog"."title", "blog_blog"."content", "blog_blog"."author_id", "blog_blog"."created_at", "blog_blog"."updated_at" FROM "blog_blog"
+SELECT "author_author"."id", "author_author"."name", "author_author"."email", "author_author"."bio" FROM "author_author" WHERE "author_author"."id" IN (1, 2)
+```
+
+
