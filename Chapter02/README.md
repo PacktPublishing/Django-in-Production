@@ -5,6 +5,12 @@
   * [Configuring Django with PostgreSQL](#configuring-django-with-postgresql)
 * [Using Models and Django ORM](#using-models-and-django-orm)
   * [Basic ORM concepts](#basic-orm-concepts)
+* [Understanding the crux of Django Migration](#understanding-the-crux-of-django-migration)
+  * [Performing DB migrations like a pro](#performing-db-migrations-like-a-pro)
+    * [Use Fake migration](#use-fake-migration)
+* [Learning about Performance Optimization](#learning-about-performance-optimization)
+  * [Understanding Django ORM like a pro](#understanding-django-orm-like-a-pro)
+    * [Using select_related and prefetch_related](#using-select_related-and-prefetch_related)
 
 
 ## Setting up postgreSQL with Django Project
