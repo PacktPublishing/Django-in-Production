@@ -21,14 +21,27 @@
 
 ## Technical requirements
 
+No code applicable to this section
+
 ## Learning the basics of Django Authentication
 
-Session-based authentication is a vast topic in itself and beyond the scope of this book. If you are not familiar with the session-based authentication concept [Read more on official website](https://docs.djangoproject.com/en/stable/topics/http/sessions/)
+No code applicable to this section
+
+> [!NOTE]
+> 
+> Session-based authentication is a vast topic in itself and beyond the scope of this book. If you are not familiar with the session-based authentication concept [Read more on official website](https://docs.djangoproject.com/en/stable/topics/http/sessions/)
 
 ## Customizing User model
 
 Custom Model manager from BaseUserManager
 
+Create a new app called `custom_user` using the following command
+
+```bash
+python manage.py startapp custom_user
+```
+
+Define a custom user model in the `custom_user/models.py` file
 ```python
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
@@ -36,7 +49,7 @@ from django.db import models
 
 class CustomUserManager(BaseUserManager):
     """
-    Used for updating default behaviors Django provides
+    Used for updating default behaviour Django provides
     """
 
     def create_user(self, phone_no, password, **kwargs):
@@ -48,6 +61,8 @@ class CustomUserManager(BaseUserManager):
 
     def create_superuser(self, phone_no, password, **kwargs):
         # creates superuser.
+        user = self.create_user(phone_no, password, **kwargs)
+        return user
 
 
 class CustomUser(AbstractUser):
@@ -58,13 +73,72 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 ```
 
+Now we need to update the `settings.py` file to use our custom user model
+
+```python
+AUTH_USER_MODEL = 'accounts.CustomUser'
+```
+
+> [!NOTE]
+> 
+> If you are using custom user model, you need to create a new database and run migrations. If you use it with existing database you will get errors.
+
+Now run the migration for the new model
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+> [!NOTE]
+> > [Please Read more on official website](https://docs.djangoproject.com/en/stable/topics/auth/customizing/#substituting-a-custom-user-model)
+
+## Using OneToOneField relationship with user model
+
+To use OneToOneField relationship with user model, we need to create a new model and add a OneToOneField relationship with the user model
+
+create a new app called `user_profile` using the following command
+
+```bash
+python manage.py startapp custom_user
+``` 
+
+Define a new model in the `user_profile/models.py` file
+
+```python
+from django.db import models
+
+class UserProfile(models.Model):
+    user = models.OneToOneField('auth.User', related_name='user_profile', on_delete=models.CASCADE)
+    phone_no = models.CharField(unique=True, max_length=20)
+    city = models.CharField(max_length=40)
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        verbose_name = "User Profile"
+        verbose_name_plural = "User Profiles"
+```
+
+Now run the migration for the new model
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
 ## Using Django Permissions and Groups
 
 ### Using permissions and groups in Django Admin
 
 ### Creating custom permissions
 
+Create a custom permission in the `blog/models.py` file to allow only certain users update the title and content of the blog. 
+
 ```python
+from django.db import models
+
 class Blog(models.Model):
   ...
   class Meta:
@@ -74,10 +148,28 @@ class Blog(models.Model):
     ]
 ```
 
-```python
-if user.has_perm("blog.update_title"):
-   # perform operation
+Now we need to run the migration for the new permission
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
 ```
+
+Now we can use the permission in our code as follows
+```python
+def update_blog_title(request):
+    blog_id = request.GET.get('id')
+    blog = Blog.objects.get(id=blog_id)
+    if request.user.has_perm("blog.update_title"):
+        # perform operation
+        return HttpResponse('User has permission to update title')
+    return HttpResponse('User does not have permission to update title')
+```
+
+> [!NOTE]
+> 
+> If you are logged into Django admin interface as a superuser, then you would always see User has permission to update title. This happens because in Django super user has access to all the permissions implicitly. But not every staff user has site wide permission, so one should create a normal staff user and assign custom permission to test the code.
+
 
 ### Using Django Permissions and Group for API
 
@@ -102,7 +194,7 @@ For more details, check the official documentation on how to create a custom per
 
 ### Adding DRF Token based auth to the Django Project
 
-Django settings to attach the authtoken app to our project
+Go to Django `settings.py` to attach the `rest_framework.authtoken` app to our project
 
 ```python
 INSTALLED_APPS = [
@@ -111,7 +203,13 @@ INSTALLED_APPS = [
 ]
 ```
 
-We need to add the following configuration to our settings.py to enable authentication and permission to all our views
+Now we need to run the migration for the `authtoken` to be available. 
+
+```bash
+python manage.py migrate
+```
+In order to enable authentication and permission to all our views.
+We need to add the following configuration to our `settings.py` file
 
 ```python
 REST_FRAMEWORK = {
@@ -124,7 +222,7 @@ REST_FRAMEWORK = {
 }
 ```
 
-permission_classes as AllowAny for our view, or else we will get a 401 error
+Create a login view in the `custom_user/views.py` file
 
 ```python
 from rest_framework.authtoken.models import Token
@@ -142,14 +240,44 @@ def login(request):
   token = Token.objects.get_or_create(user=user)
   return Response(data={"token": token.key})
 ```
+Use `permission_classes` as `AllowAny` for our `login` view, or else we will get a 401 error.
 
-DRF permission class uses the Django Groups and Permissions framework [More Details](https://www.django-rest-framework.org/api-guide/permissions/#api-reference/)
+Now link the `login` view to the `custom_user/urls.py` file
 
-For the custom Authentication class[follow this link](https://www.django-rest-framework.org/api-guide/authentication/#custom-authentication/)
+```python
+urlpatterns = [
+    ...
+    path('login/', views.login),
+]
+```
+
+Also do not forget to link the `custom_user/urls.py` file to the `config/urls.py` file
+
+```python
+urlpatterns = [
+    ...
+    path('api/auth/v1/', include('custom_user.urls')),
+]
+```
+
+We can test our login view using the browser and going to the following URL and passing the username and password as form data
+
+```bash
+http://127.0.0.1:8000/api/auth/v1/login/
+```
+
+> [!NOTE]
+> 
+> DRF permission class uses the Django Groups and Permissions framework [More Details](https://www.django-rest-framework.org/api-guide/permissions/#api-reference/)
+> For the custom Authentication class [follow this link](https://www.django-rest-framework.org/api-guide/authentication/#custom-authentication/)
 
 ### Understanding the limitations of Token-Based Authentication of DRF
 
-### Learning about third-party token-based authentication packages
+No code applicable to this section
+
+## Learning about third-party token-based authentication packages
+
+No code applicable to this section
 
 ### django-rest-knox
 
