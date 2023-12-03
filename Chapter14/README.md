@@ -1,4 +1,4 @@
-# Monitoring Django Application
+# Chapter 14: Monitoring Django Application
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)

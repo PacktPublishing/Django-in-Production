@@ -1,4 +1,4 @@
-# Working with Git and CI pipeline using Django
+# Chapter 12: Working with Git and CI pipeline using Django
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)

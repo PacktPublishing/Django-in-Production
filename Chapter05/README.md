@@ -1,4 +1,4 @@
-# Mastering Django Authentication and Authorization
+# Chapter 5: Mastering Django Authentication and Authorization
 
 ## Table of contents
 
@@ -91,13 +91,13 @@ python manage.py migrate
 ```
 
 > [!NOTE]
-> > [Please Read more on official website](https://docs.djangoproject.com/en/stable/topics/auth/customizing/#substituting-a-custom-user-model)
+> To use custom use model in Django [Please Read more on official website](https://docs.djangoproject.com/en/stable/topics/auth/customizing/#substituting-a-custom-user-model)
 
 ## Using OneToOneField relationship with user model
 
 To use OneToOneField relationship with user model, we need to create a new model and add a OneToOneField relationship with the user model
 
-create a new app called `user_profile` using the following command
+Create a new app called `user_profile` using the following command
 
 ```bash
 python manage.py startapp custom_user
@@ -130,7 +130,11 @@ python manage.py migrate
 
 ## Using Django Permissions and Groups
 
+No code applicable to this section
+
 ### Using permissions and groups in Django Admin
+
+No code applicable to this section
 
 ### Creating custom permissions
 
@@ -188,9 +192,15 @@ For more details, check the official documentation on how to create a custom per
 
 ### Caveats of using permissions
 
+No code applicable to this section
+
 ## Using DRF token-based Authentication
 
+No code applicable to this section
+
 ### Integrating Token-Based Authentication in DRF
+
+No code applicable to this section
 
 ### Adding DRF Token based auth to the Django Project
 

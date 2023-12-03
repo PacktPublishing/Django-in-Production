@@ -1,4 +1,4 @@
-# Chapter 2 Exploring Django ORM, Models and Migrations
+# Chapter 2: Exploring Django ORM, Models and Migrations
 
 ## Table of contents
 * [Setting up postgreSQL with Django Project](#setting-up-postgresql-with-django-project)

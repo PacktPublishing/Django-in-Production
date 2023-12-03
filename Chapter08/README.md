@@ -1,4 +1,4 @@
-# Using Celery with Django
+# Chapter 8: Using Celery with Django
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)

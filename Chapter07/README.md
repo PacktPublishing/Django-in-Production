@@ -1,4 +1,4 @@
-# Using Pagination, Django Signals, and Custom Middleware
+# Chapter 7: Using Pagination, Django Signals, and Custom Middleware
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)

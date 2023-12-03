@@ -1,4 +1,4 @@
-# Exploring Conventions in Django
+# Chapter 10: Exploring Conventions in Django
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)

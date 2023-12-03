@@ -1,4 +1,4 @@
-# Writing Tests in Django
+# Chapter 9: Writing Tests in Django
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)

@@ -1,4 +1,4 @@
-# Dockerizing Django Application
+# Chapter 11: Dockerizing Django Application
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)

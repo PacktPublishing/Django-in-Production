@@ -1,4 +1,4 @@
-# Deploying Django in AWS
+# Chapter 13: Deploying Django in AWS
 
 ## Table of contents
 * [Technical requirements](#technical-requirements)
