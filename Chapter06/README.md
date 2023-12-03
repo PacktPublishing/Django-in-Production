@@ -243,10 +243,12 @@ LOGGING = {
     }, 
 } 
 ```
+> [!NOTE]
+> We are not using the default logging configuration. We are using our own custom log handler class configuration. 
+> The default logging configuration provided by Python `logging.handlers.RotatingFileHandler` would not create the `log` folder automatically.
+> Log files would be created in the `log` folder, so we need to create the `log` folder manually. 
 
-Log files would be created in the `log` folder, so we need to create the `log` folder manually. If we want to automatically create the `log` folder, we can add the following code 'common/custom_log_handler.py' file
-
-
+We want to automatically create the `log` folder, we can add the following code to `common/custom_log_handler.py` file
 ```python
 import os
 from logging.handlers import RotatingFileHandler
