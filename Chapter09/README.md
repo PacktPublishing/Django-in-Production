@@ -38,11 +38,21 @@
 
 ## Introducing the different types of tests in Software software Development
 
+No code applicable to this section
+
 ### Unit testing
+
+No code applicable to this section
 
 ### Integration testing
 
+No code applicable to this section
+
 ### E2E testing
+
+[Writing E2E test with postman](https://learning.postman.com/docs/writing-scripts/test-scripts/)
+[Playwright](https://playwright.dev/)
+[Puppeteer](https://pptr.dev/)
 
 ## Setting up tests for Django and DRF
 unittest [Read more](https://docs.djangoproject.com/en/stable/topics/testing/)
@@ -51,8 +61,14 @@ pytest-django [Read more](https://pytest-django.readthedocs.io/en/latest/)
 
 ### Structuring and Naming test
 
+No code applicable to this section
+
 ### Setting up a database for tests
-NAME config inside the TEST attribute
+
+To setup a database for tests we can use the following configuration in the `settings.py` file.
+
+Add the `TEST` key in the `DATABASES` config in the `settings.py`. The `TEST` key would be used to create a separate database for tests, `NAME` is the name of the database that would be created for tests.
+
 ```python
 DATABASES = { 
     "default": { 
@@ -65,9 +81,14 @@ DATABASES = {
     }, 
 } 
 ```
+> [!CAUTION]
+> 
+> If you are using [ElephantSQL](https://www.elephantsql.com/) as your database provider then you might get errors while running tests. 
+> To fix this issue you can use [Neon](https://neon.tech) as your database provider, Neon is a postgres fork that is compatible with Postgres. Please note use Neon only for testing purposes and in this chapter only, do not use it in production unless you are confident on it.
 
 ### Writing basic tests in DRF
 
+Add the following code in the `blog/views.py` file
 ```python
 from rest_framework import status 
 from rest_framework.decorators import api_view 
@@ -79,10 +100,21 @@ def basic_req(request):
         resp = {"msg": "hello world!"} 
         return Response(data=resp, status=status.HTTP_200_OK) 
 ```
+Link the view in the `blog/urls.py` file
 
- DRF’s default testing framework to write tests
 ```python
-from django.urls import reverse 
+from django.urls import path
+from blog import views
+
+urlpatterns = [
+    path('hello-world/', views.basic_req, name='basic-req'),
+]
+```
+
+Using DRF’s default testing framework to write tests. 
+
+Add the following code in the `blog/tests.py` file
+```python
 from rest_framework.test import APITestCase 
 from rest_framework import status 
  
@@ -92,7 +124,7 @@ class BasicTests(APITestCase):
         Test the basic url path response. 
         """ 
         # ARRANGE - Create a reverse URL and the expected response. 
-        url = reverse('basic-req')  
+        url = '/blog/hello-world/' 
         expected_data = {"msg": "hello world!"} 
  
         # ACT – Perform API call by DRF’s test APIClient. 
@@ -103,48 +135,104 @@ class BasicTests(APITestCase):
         self.assertEqual(response.data, expected_data) 
 ```
 
+Run the test using the following command and you should see the following output : 
+```bash
+> python manage.py test
+
+Found 1 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+custom middleware before request view
+custom middleware after response view
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.369s
+
+OK
+Destroying test database for alias 'default'...
+```
+
 ### Writing tests for advance use cases
 
 #### Testing API Authentication
 
+To test Authentication we need to enable the authentication in our view. We can use the following code in the `blog/views.py` file
 ```python
-class BasicTests(APITestCase): 
-    def test_unauthenticated_req(self): 
-        url = reverse('basic-req') 
-        response = self.client.get(url, format='json') 
- 
-        # Since the user is not logged in it would get 401. 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED) 
- 
-    def test_authenticated_req(self): 
-        url = reverse('basic-req') 
-        expected_data = {"msg": "hello world!"} 
-        token = Token.objects.get(user__username='demouser').key 
- 
-        # Login to the request using the HTTP header token. 
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token}') 
-        response = self.client.get(url, format='json') 
- 
-        # User is logged in we would get the expected 200 response code. 
-        self.assertEqual(response.status_code, status.HTTP_200_OK) 
-        self.assertEqual(response.data, expected_data) 
- 
+from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
-    def test_wrong_authenticated_req(self): 
-        url = reverse('basic-req') 
-     
-        # Login to the request using a random wrong token. 
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token random') 
-        response = self.client.get(url, format='json') 
- 
-        # Request has the wrong token so it would get 401. 
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def hello_world_2(request):
+    resp = {"msg": "hello world!"}
+    return Response(data=resp, status=status.HTTP_200_OK)
+```
+
+
+Now let us update our test case to use the authentication token. We can use the following code in the `blog/tests.py` file
+
+```python
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
+from rest_framework import status
+class BasicTests2(APITestCase):
+    def test_unauthenticated_req(self):
+        url = '/blog/hello-world-2/'
+        response = self.client.get(url, format='json')
+
+        # Since the user is not logged in it would get 401.
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_authenticated_req(self):
+        url = '/blog/hello-world-2/'
+        expected_data = {"msg": "hello world!"}
+        # Create a user and get the token. This is important.
+        user = User.objects.create_user(username='demouser', password='demopass')
+        token, created = Token.objects.get_or_create(user=user)
+
+        # Login to the request using the HTTP header token.
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        response = self.client.get(url, format='json')
+
+        # User is logged in we would get the expected 200 response code.
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, expected_data)
+
+    def test_wrong_authenticated_req(self):
+        url = '/blog/hello-world-2/'
+
+        # Login to the request using a random wrong token.
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token random')
+        response = self.client.get(url, format='json')
+
+        # Request has the wrong token so it would get 401.
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_force_authenticate_with_user(self):
+        """
+        Setting `.force_authenticate()` with a user forcibly authenticates.
+        """
+        u1 = User.objects.create_user('a1', 'a1@abc.co')
+        url = '/blog/hello-world/'
+    
+        # Forcefully login and update request.user
+        self.client.force_authenticate(user=u1)
+        response = self.client.get(url)
+        expected_data = {"msg": "hello world!"}
+        # Tests work with the login user.
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, expected_data)
+
 ```
 
 #### Setting up and tearing down test cases
 
 ```python
-class BasicTests(APITestCase): 
+class BasicTests3(APITestCase): 
      
     def setUp(self): 
         self.test_url = reverse('basic-req') 
@@ -349,16 +437,22 @@ from django.test import tag
 class SampleTestCase(APITestCase): 
     @tag("fast") 
     def test_fast(self): 
-        ... 
+        print("fast test running") 
  
     @tag("slow") 
     def test_slow(self): 
-        ... 
+        print("slow test running")
  
     @tag("slow", "core") 
     def test_slow_but_core(self): 
-        ... 
+        print("slow but core test running")
 ```
+
+To run the tests with tag `core` we can use the following command -: 
+```bash
+python manage.py test --tag=core
+```
+
 [Read more](https://docs.djangoproject.com/en/stable/topics/testing/tools/#tagging-tests)
 
 ### Using Postman to create an integration test suite
@@ -371,7 +465,11 @@ How to use the postman Postman cli CLI to run test cases from the CI/CD pipeline
 
 ### Creating different types of tests
 
+No code applicable to this section
+
 ### Avoiding tests
+
+No code applicable to this section
 
 ## Exploring Testtest-Driven Development (TDD)
 

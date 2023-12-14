@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework import filters
 from blog import models
-from blog import serializer
+from blog import serializers as serializer
 
 
 # Create your views here.

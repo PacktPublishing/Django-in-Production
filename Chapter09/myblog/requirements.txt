@@ -1,0 +1,7 @@
+Django
+djangorestframework
+psycopg2-binary
+python-social-auth
+redis
+django-cacheops
+factoryboy

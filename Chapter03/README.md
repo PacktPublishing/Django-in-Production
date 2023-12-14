@@ -219,7 +219,7 @@ class Author(models.Model):
     def fetch_short_bio(self):
          return self.bio[:100]
 
-# author/serializer.py
+# author/serializers.py
 class AuthorSerializer(serializers.ModelSerializer):
     long_bio = serializers.CharField(source='bio')
     short_bio = serializers.CharField(source='fetch_short_bio')
