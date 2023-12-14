@@ -261,72 +261,104 @@ class BasicTests3(APITestCase):
 
 #### Using Factoryboy
 
+To use factoryboy we need to install it using the following command
+```bash
+pip install factory-boy
+
+Create a new file `blog/factoryboy.py` and add the following code in it.
 ```python
-from factory import SubFactory, Sequence 
-from factory.django import DjangoModelFactory 
- 
-from blog import models as blog_models 
-from author import models as author_models 
- 
-class AuthorFactory(DjangoModelFactory): 
-    class Meta: 
-        model = author_models.Author 
-    name = Sequence(lambda n: f'Author {n}') 
- 
- 
-class BlogFactory(DjangoModelFactory): 
-    class Meta: 
-        model = blog_models.Blog 
-    title = Sequence(lambda n: f'Blog {n}') 
-    author = SubFactory(AuthorFactory) 
+from factory import SubFactory, Sequence
+from factory.django import DjangoModelFactory
+
+from blog import models as blog_models
+from author import models as author_models
+
+
+class AuthorFactory(DjangoModelFactory):
+    class Meta:
+        model = author_models.Author
+
+    name = Sequence(lambda n: f'Author {n}')
+    email = Sequence(lambda n: f'a{n}@gmail.com')
+
+
+class CoverImageFactory(DjangoModelFactory):
+    class Meta:
+        model = blog_models.CoverImage
+
+    image_link = Sequence(lambda n: f'https://www.example.com/image/{n}')
+
+
+class BlogFactory(DjangoModelFactory):
+    class Meta:
+        model = blog_models.Blog
+
+    title = Sequence(lambda n: f'Blog {n}')
+    content = Sequence(lambda n: f'Blog content {n}')
+    author = SubFactory(AuthorFactory)
+    cover_image = SubFactory(CoverImageFactory)
 ```
 
+
+Now we can use the factory to create test data in our test cases. We can use the following code in the `blog/tests.py` file
+
 ```python
-class BlogTestCase(APITestCase): 
+
+from blog.factoryboy import BlogFactory
+class BlogTestCase4(APITestCase): 
  
-    def test_total_blogs(self): 
-        blogs = BlogFactory.create_batch(4) 
-        url = reverse('blog-list') 
-         
-        resp = self.client.get(url, format='json') 
+    def test_total_blogs(self):
+        blogs = BlogFactory.create_batch(4)
+        url = '/blog/unpaginated/'
+        
+        resp = self.client.get(url, format='json')
+
+        self.assertEqual(len(resp.data['blogs']), 4)
  
-        self.assertEqual(len(resp['data']), 4) 
 ```
+
+Read more about factoryboy from the official documentation -: [Link](https://factoryboy.readthedocs.io/en/stable/orms.html)
 
 #### Using setUpTestData
 
+Example using only setUp
 ```python
-class BlogTestCase(APITestCase): 
-    def setUp(self): 
-        self.blog = BlogFactory(title='a1', content='a b c') 
-     
-    def test_word_count(self): 
-        expected_count = 3 
-        actual_count = public.count_word(self.blog) 
-        self.assertEqual(expected_count, actual_count) 
-         
-    def test_title_length(self): 
-        expected_length = 2 
-        actual_length = public.calculate_length(self.blog) 
-        self.assertEqual(expected_length, actual_length) 
+class BlogTestCase5(APITestCase):
+    def setUp(self):
+        self.blog = BlogFactory(title='a1', content='a b c')
+        print('Running Setup multiple times')
+
+    def test_word_count_1(self):
+        expected_count = 3
+        print('test_word_count_1 running')
+        self.assertEqual(expected_count, 3)
+
+    def test_title_length_1(self):
+        expected_length = 2
+        print('test_title_length_1 running')
+        self.assertEqual(expected_length, 2) 
 ```
 
+Example using `setUpTestData` 
 ```python
-class BlogTestCase(APITestCase): 
-    @classmethod 
-    def setUpTestData(cls): 
-        cls.blog = BlogFactory(title='a1', content='a b c') 
- 
-    def test_word_count(self): 
-        expected_count = 3 
-        actual_count = public.count_word(self.blog) 
-        self.assertEqual(expected_count, actual_count) 
- 
-    def test_title_length(self): 
-        expected_length = 2 
-        actual_length = public.calculate_length(self.blog) 
-        self.assertEqual(expected_length, actual_length) 
+class BlogTestCase6(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.blog = BlogFactory(title='a1', content='a b c')
+        print('Running Setup only once')
+
+    def test_word_count_2(self):
+        expected_count = 3
+        print('test_word_count_2 running')
+        self.assertEqual(expected_count, 3)
+
+    def test_title_length_2(self):
+        expected_length = 2
+        print('test_title_length_2 running')
+        self.assertEqual(expected_length, 2) 
 ```
+
+Read more about `setUpTestData` from the official documentation -: [Link](https://docs.djangoproject.com/en/stable/topics/testing/tools/#django.test.TestCase.setUpTestData)
 
 #### Using mocks as less as possible
 
@@ -338,29 +370,41 @@ class BlogTestCase(APITestCase):
 
 #### Writing tests for Celery
 
+
+#### Writing tests for Signals and Receivers
+
+Write a signal in the `author/signals.py` file
 ```python
-from django.db.models.signals import pre_save 
-from django.dispatch import receiver 
-from myapp.models import MyModel 
+from django.db.models.signals import post_save 
+from django.dispatch import receiver
+from author.models import Author 
  
-@receiver(pre_save, sender=MyModel) 
+@receiver(post_save, sender=Author) 
 def my_handler(sender, **kwargs): 
-    ... 
+    print("Signal called")
 ```
 
+Add the following code in the `author/tests/tests_signals.py` file
 ```python
-class SignalsTest(TestCase): 
-    def test_connection(self): 
-        result = signals.post_save.disconnect( 
-           receiver=my_handler, sender=MyModel 
-        ) 
+from django.test import TestCase
+from django.db.models import signals
+
+from author.models import Author
+from author.receivers import my_handler
+
+
+class SignalsTest(TestCase):
+    def test_connection(self):
+        result = signals.post_save.disconnect(
+           receiver=my_handler, sender=Author
+        )
         self.assertTrue(result) 
 ```
 
 Read more about the disconnect function from Django official documentation -: [Link](https://docs.djangoproject.com/en/stable/topics/signals/#disconnecting-signals)
 
-#### Writing tests for Signals and Receivers
 
+Factoryboy also gives a way to mute signals. We can use the following code in the `author/tests/tests_signals.py` file
 ```python
 from factory.django import mute_signals  
  
@@ -369,13 +413,15 @@ class SignalsTest(TestCase):
     def test_demo(self): 
         with mute_signals(signals.pre_save, signals.post_save): 
             # pre_save/post_save won't be called here. 
-            return SomeFactory(), SomeOtherFactory() 
+            return BlogFactory(), AuthorFactory() 
 ```
 Read more on how we can use factoryboy to mute signals and have faster test execution. [Link](https://factoryboy.readthedocs.io/en/stable/orms.html#factory.django.mute_signals)
 
 ### Using custom Django Runners
 
 Django’s default runner DiscoverRunner
+
+Create a new file `common/custom_runner.py` and add the following code in it.
 ```python
 from django.test.runner import DiscoverRunner 
  
@@ -391,6 +437,23 @@ class CustomRunner(FillData, DiscoverRunner):
     pass 
 ```
 
+Now add the custom runner in the `settings.py` file
+```python
+TEST_RUNNER = 'common.custom_runner.CustomRunner'
+```
+
+Now run the tests using the following command and you should see the following output
+```bash
+> python manage.py test
+
+### Populating Test Cases Database ###
+### Database populated ############
+Creating test database for alias 'default'...
+...
+```
+
+For more details on how to write custom runners please refer to the official documentation -: [Link](https://docs.djangoproject.com/en/stable/topics/testing/advanced/#defining-a-test-runner)
+
 ## Learning the best practices to write tests
 
 ### Using unit tests more often
@@ -399,28 +462,53 @@ class CustomRunner(FillData, DiscoverRunner):
 
 ### Avoiding time bomb test failures
 
+Install freezegun using the following command
+```bash
+pip install freezegun
+```
+To test freezegun we can assume the following condition. A user can post only 10 blogs per day.
+
+Let us create a new file `blog/public.py` and add the following code in it
 ```python
-from django.test import TestCase 
-from django.utils import timzone 
-from freezegun import freeze_time 
- 
-class CommentTests(APITestCase): 
-    def test_comment_block(self): 
-        today = timezone.now().date() 
-        tomo = timezone.now().date() + timzone.timedelta(days=1) 
- 
-        with freeze_time(today) as frozentime: 
-            # Post 10 comments on users 
-            action = post_10_comments(comment_list) 
-            # Check if the user can post more comments today 
-            result = check_user_can_post(user) 
-            # Validate that the user cannot post a comment today. 
-            self.assertFalse(result) 
- 
-            # Move the date to the next day 
-            frozentime.move_to(tomo) 
-            result = check_user_can_post() 
-            self.assertTrue(result)            
+from django.utils import timezone
+
+from blog.models import Blog
+
+
+def check_if_allowed_to_publish_blog(author):
+    # check if author is allowed to publish blog
+    blog_count_for_today = Blog.objects.filter(author_id=author.id, created_at__date=timezone.now().date()).count()
+    return blog_count_for_today < 10
+```
+
+Now use the following code in the `blog/tests.py` file
+
+```python
+from django.utils import timezone 
+from freezegun import freeze_time
+
+from blog.factoryboy import BlogFactory, AuthorFactory
+from blog import public
+
+class BlogTests7(APITestCase):
+    def test_blog_time_block(self):
+        today = timezone.now().date()
+        tomo = timezone.now().date() + timezone.timedelta(days=1)
+
+        with freeze_time(today) as frozentime:
+            # Post 10 blogs
+            author = AuthorFactory()
+            create_10_blogs = BlogFactory.create_batch(10, author=author)
+            # Check if the user can post more blogs today
+            user_can_post = public.check_if_allowed_to_publish_blog(author)
+            # Validate that the user cannot post a blog today.
+            self.assertFalse(user_can_post)
+
+            # Move the date to the next day
+            frozentime.move_to(tomo)
+            # Validate that the user cannot post a blog tomorrow.
+            result = public.check_if_allowed_to_publish_blog(author)
+            self.assertTrue(result)
 ```
 
 ### Avoiding brittle tests
@@ -432,19 +520,20 @@ class CommentTests(APITestCase):
 ### Using test tags to group tests
 
 ```python
-from django.test import tag 
+from django.test import tag
+from rest_framework.test import APITestCase
  
-class SampleTestCase(APITestCase): 
-    @tag("fast") 
-    def test_fast(self): 
-        print("fast test running") 
- 
-    @tag("slow") 
-    def test_slow(self): 
+class BlogTests8(APITestCase):
+    @tag("fast")
+    def test_fast(self):
+        print("fast test running")
+
+    @tag("slow")
+    def test_slow(self):
         print("slow test running")
- 
-    @tag("slow", "core") 
-    def test_slow_but_core(self): 
+
+    @tag("slow", "core")
+    def test_slow_but_core(self):
         print("slow but core test running")
 ```
 
