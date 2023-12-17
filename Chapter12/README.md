@@ -134,7 +134,7 @@ jobs:
        with: 
          python-version: 3.9 
      - name: Install Dependencies 
-       run: pip install -r requirements/ci-requirements.txt 
+       run: pip install -r requirements/ci-requirements-base.txt 
 
      - name: Run Django migrations 
        run: python manage.py migrate 

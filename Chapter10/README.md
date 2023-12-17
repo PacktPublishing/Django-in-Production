@@ -208,4 +208,4 @@ gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers=4 --max-requests=
 
 Now when we run the application using gunicorn, we can see that the application is running on port 8000 on our browser.
 
-Open the browser and go to http://0.0.0.0:8000/admin we can see the application running.
+Open the browser and go to http://0.0.0.0:8000/blog/hello-world/?format=json we can see the application running.
