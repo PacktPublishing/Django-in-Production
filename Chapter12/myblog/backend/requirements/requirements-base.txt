@@ -1,0 +1,7 @@
+Django==5.0
+redis==5.0.1
+django-cacheops==7.0.2
+celery==5.3.6
+psycopg2-binary==2.9.9
+djangorestframework==3.14.0
+celery-redbeat==2.1.1

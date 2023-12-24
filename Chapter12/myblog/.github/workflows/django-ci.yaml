@@ -1,0 +1,54 @@
+name: Django CI Test Cases
+on: push # Run this Action on every code push made.
+env:
+  DB_NAME: blog_testdb
+  DB_USERNAME: root
+  DB_PASSWORD: root
+  DB_HOSTNAME: 127.0.0.1
+  DB_PORT: 5432
+  DB_ENGINE: django.db.backends.postgresql
+  REDIS_HOST: 127.0.0.1
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: redisPassWord
+jobs:
+  # Label of the container job
+  container-job:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: blog_testdb
+        ports:
+          - 5432:5432
+        # Set health checks to wait until Postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+    steps:
+     - uses: actions/checkout@v3
+     - name: Set up Python 3.11
+       uses: actions/setup-python@v3
+       with:
+         python-version: 3.11
+     - name: Install Dependencies
+       run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements/requirements-local.txt
+     - name: Run Django migrations
+       run: |
+        cd backend
+        python manage.py migrate
+     - name: Running Django Test cases
+       run: |
+        cd backend
+        python manage.py test --no-input
