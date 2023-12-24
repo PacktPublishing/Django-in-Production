@@ -15,7 +15,6 @@ RUN pip install -r requirements/requirements-local.txt
 # Copy the Application code
 COPY . /app/
 
-
 COPY ./entrypoint.sh /app/entrypoint.sh
 
 # Give permission to entrypoint.sh file as executable.
