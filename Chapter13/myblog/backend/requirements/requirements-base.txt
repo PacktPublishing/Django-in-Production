@@ -5,3 +5,5 @@ celery==5.3.6
 psycopg2-binary==2.9.9
 djangorestframework==3.14.0
 celery-redbeat==2.1.1
+django-health-check==3.17.0
+psutil==5.9.7

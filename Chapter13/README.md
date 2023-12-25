@@ -33,6 +33,9 @@
 
 ## Technical requirements
 
+> [!NOTE]
+> Please note this chapter uses AWS and github. AWS and github continuously changes their UI and adds new feature, so it can be possible that the UI might be different from the screenshots in the book. Please use the latest UI and follow the steps mentioned in the book.
+
 ## Learning the Basics of AWS
 [AWS Account](https://aws.amazon.com)
 
@@ -110,6 +113,31 @@ REDIS_PASSWORD=redisPassWord
 
 Now run `docker compose up --build` to make sure that the application is running fine.
 
+Let us now start integrating the application with AWS ElasticBeanstalk.
+
+Install the AWS EBCLI using the following command.
+
+```bash
+pip install awsebcli
+```
+
+Now run the following command to initialize the Elastic Beanstalk environment.
+
+```bash
+eb init
+```
+Follow the steps as mentioned in the wizard. 
+
+Next run the following command to create the environment.
+
+```bash
+eb create prod-env
+```
+
+Now open the URL in the browser and you should see the application running.
+
+
+
 #### Creating RDS Postgres instance and connecting to Django
 
 ##### Creating a new RDS environment
@@ -118,19 +146,22 @@ Now run `docker compose up --build` to make sure that the application is running
 
 ##### Configuring Django application with the RDS
 
-In settings.py
 
-```python
-DATABASES = { 
-    "default": { 
-        "ENGINE": 'django.db.backends.postgresql', 
-        "NAME": 'postgres', 
-        "USER": 'django_db_user', 
-        "PASSWORD": 'abc^A12a*12', 
-        "HOST": 'django-demo.cz2r2xzvhh2n.ap-south-1.rds.amazonaws.com', 
-        "PORT": '5432', 
-    } 
-} 
+Let us now connect RDS to the Beanstalk environment. Follow the steps mentioned in Chapter 13.
+
+Now create a file `.env` in the root of the repository and add the following environment variables.
+
+```bash
+DEBUG=True
+DJANGO_ALLOWED_HOSTS=*
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+DB_USERNAME=<RDS USERNAME>
+DB_PASSWORD=<RDS PASSWORD>
+DB_HOSTNAME=<RDS HOSTNAME>
+DB_PORT=<RDS PORT>
+REDIS_HOST=redis_db
+REDIS_PORT=6379
 ```
 
 #### Creating ElastiCache Redis instance and connecting to Django
@@ -150,30 +181,56 @@ CACHES = {
 
 [AWS has official GitHub actions ](https://github.com/aws-actions/configure-aws-credentials) 
 
+Create a new file in the root of the repository named `.github/workflows/deploy-django.yml` and add the following code.
 ```YAML
-name: Test Github-AWS actions integration 
+name: Github-AWS actions integration
+on: [workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-2
+      - name: get caller identity
+        run: aws sts get-caller-identity
 
-on: [workflow_dispatch] 
+      - name: Install aws cli and beanstalk cli
+        run: pip install awsebcli awscli
 
-jobs: 
-  build: 
-    runs-on: ubuntu-latest 
-    strategy: 
-      matrix: 
-        python-version: [3.8] 
-    steps: 
+      - name: Get Secret Names by Prefix
+        uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        with:
+          secret-ids: |
+            django*    # Retrieves all secrets that start with 'django'
 
-      - uses: actions/checkout@v1 
-      - name: Configure AWS Credentials 
-        uses: aws-actions/configure-aws-credentials@v4 
-        with: 
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }} 
-          aws-region: us-east-2 
+      - name: Save secret manager variables to .env
+        run: printenv | grep "^DJANGO" > .env
 
-      - name: get caller identity 
-        run: aws sts get-caller-identity 
+      - name: git add for .env
+        run: git add .
+
+      - name: Run eb init
+        run: eb init django-demo-app --region ap-south-1 --platform docker
+
+      - name: Run eb use
+        run: eb use prod-env --region ap-south-1
+
+      - name: Run eb deploy
+        run: eb deploy --staged
 ```
+
+Now add the secrets to the repository. Go to the repository settings and click on secrets. Add the following secrets.
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_KEY`
+
+Now we have our GitHub actions ready. Let us push the code to the repository and deploy to production.
 
 ## Following Best Practices with AWS Infrastructure
 
