@@ -93,7 +93,22 @@ No code needed for this section.
 > Our current repository is a repository that we have been working on for the last 12 chapters, where each chapter is segregated into folders. Unfortunately just like github actions we cannot deploy a repository with multiple project folders. So we will create a new repository with just the Django application.
 > The simplest way to do this is to create a new repository and copy the Django application folder into the new repository. Please copy the myblog folder into a new repository. 
 
+Create a new file with all the env variables in the root of the repository. The file should be named `.env`
+```
+DEBUG=True
+DJANGO_ALLOWED_HOSTS=*
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=django_in_production
+DB_USERNAME=root
+DB_PASSWORD=root
+DB_HOSTNAME=postgresql_db
+DB_PORT=5432
+REDIS_HOST=redis_db
+REDIS_PORT=6379
+REDIS_PASSWORD=redisPassWord
+```
 
+Now run `docker compose up --build` to make sure that the application is running fine.
 
 #### Creating RDS Postgres instance and connecting to Django
 
