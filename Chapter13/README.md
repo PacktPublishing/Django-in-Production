@@ -136,16 +136,19 @@ eb create prod-env
 
 Now open the URL in the browser and you should see the application running.
 
-
-
 #### Creating RDS Postgres instance and connecting to Django
+
+No code needed for this section.
 
 ##### Creating a new RDS environment
 
+No code needed for this section.
+
 ##### Connecting RDS to the Django server
 
-##### Configuring Django application with the RDS
+No code needed for this section.
 
+##### Configuring Django application with the RDS
 
 Let us now connect RDS to the Beanstalk environment. Follow the steps mentioned in Chapter 13.
 
@@ -166,15 +169,19 @@ REDIS_PORT=6379
 
 #### Creating ElastiCache Redis instance and connecting to Django
 
-In settings.py
+Now create a file `.env` in the root of the repository and add the following environment variables.
 
-```python
-CACHES = { 
-    "default": { 
-        "BACKEND": "django.core.cache.backends.redis.RedisCache", 
-        "LOCATION": "redis://django-demo-cache.dysbo0.ng.0001.aps1.cache.amazonaws.com:6379", 
-    } 
-} 
+```bash
+DEBUG=True
+DJANGO_ALLOWED_HOSTS=*
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+DB_USERNAME=<RDS USERNAME>
+DB_PASSWORD=<RDS PASSWORD>
+DB_HOSTNAME=<RDS HOSTNAME>
+DB_PORT=<RDS PORT>
+REDIS_HOST=<REDIS HOST>
+REDIS_PORT=<REDIS PORT>
 ```
 
 ## Deploying Django application using GitHub actions in Elastic Beanstalk
@@ -231,6 +238,26 @@ Now add the secrets to the repository. Go to the repository settings and click o
 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_KEY`
 
 Now we have our GitHub actions ready. Let us push the code to the repository and deploy to production.
+
+----
+
+Elastic beanstalk can also be configured using `.ebextensions` folder. Please check the [official documentation](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html) for more details.
+
+We have added a sample in `.ebextensions/01_initial_setup.config` file. With the following code.
+
+```
+option_settings:
+  aws:ec2:instances:
+    InstanceTypes: 't3.micro'
+
+container_commands:
+    # Demo command to show how to use how to use ebextensions
+    01_demo_command:
+        command: echo "This is demo command"
+
+```
+
+Here we are setting the instance type to `t3.micro` and running a demo command. You can add more commands to this file. Or you can create a new file and add more commands.
 
 ## Following Best Practices with AWS Infrastructure
 
