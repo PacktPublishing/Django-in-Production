@@ -44,7 +44,7 @@ CUSTOM_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'rest_framework',
+    # 'rest_framework',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + CUSTOM_APPS
@@ -93,7 +93,6 @@ DATABASES = {
         'PASSWORD': 'sb7VX8H4p-YpkBMvt2h_4fu7EGunm2B-',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

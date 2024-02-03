@@ -61,9 +61,23 @@
 
 ## Technical requirements
 
+Remote PostgreSQL server - ElephantSQL [website](https://www.elephantsql.com/)
+
+Database management GUI Tool - TablePlus [website](https://tableplus.com/)
+
+If you have any doubts about any of the topics mentioned in this or other chapters, feel free to create GitHub issues that specify all the relevant information (https://github.com/PacktPublishing/Django-in-Production/issues) or join our Django in Production Discord channel and ask for any help. 
+
+> [!NOTE]
+> 
+> Here is the invite link for the Discord server, where you can reach can post any help and also reachout to me directly: https://discord.gg/FCrGUfmDyP
+
 ## Setting up PostgreSQL with a Django Project
 
+Supported databases such as MySQL, MariaDB, and Oracle [More Info](https://docs.djangoproject.com/en/stable/ref/databases/#databases)
+
 ### Creating a PostgreSQL server
+
+Follow the steps from the book.
 
 ### Configuring Django with PostgreSQL
 
@@ -75,7 +89,7 @@ pip install psycopg2-binary
 
 Replace the default database configuration in the settings.py file with the following:
 
-Your current database configuration should be connecting to SQLite3. And the settings files should looks something like this
+Your current database configuration should be connecting to SQLite3. And the `settings.py` files should have the `DATABASES` setup config like this -
 
 ```python
 DATABASES = {
@@ -86,7 +100,7 @@ DATABASES = {
 }
 ```
 
-Now, we need to change the database configuration to connect to PostgreSQL. The settings file should look something like this:
+Now, we need to change the database configuration to connect to PostgreSQL. The `settings.py` file be updated with the following `DATABASES` config:
 
 ```python
 DATABASES = {
@@ -104,15 +118,17 @@ Please note that the above configuration is for connecting to the PostgreSQL dat
 
 ## Using models and Django ORM
 
-### Adding Django models
-Create new django apps using the following command:
+Django ORM [More Info]( https://docs.djangoproject.com/en/stable/ref/models/querysets/)
 
+### Adding Django models
+
+Create new django apps using the following command:
 ```bash
 python manage.py startapp author
 python manage.py startapp blog
 ```
 
-Add the newly created apps to the INSTALLED_APPS list in the settings.py file.
+Add the newly created apps to the `INSTALLED_APPS` list in the `settings.py` file.
 
 ```python
 CUSTOM_APPS = [
@@ -121,14 +137,14 @@ CUSTOM_APPS = [
 ]
 ```
 
-Create a new model in the author/models.py file.
+Go the `author/models.py` file and add the `Author` model code as mentioned below-
 
 ```python
 from django.db import models
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
-    user = models.OneToOneField('auth.User', on_delete=models.CASCADE)
+    email = models.EmailField()
     bio = models.TextField()
 
     def __str__(self):
@@ -136,7 +152,7 @@ class Author(models.Model):
 
 ```
 
-create a new model in the blog/models.py file.
+Add the `Blog` model code to the `blog/models.py` file
 
 ```python
 from django.db import models
@@ -152,14 +168,13 @@ class Blog(models.Model):
         return self.title
 ```
 
-Creating migrations
+Now create the migration files using the following command:
 
 ```bash
 python manage.py makemigrations
 ```
 
-Running migrations
-
+To run the migration, use the following command:
 ```bash
 python manage.py migrate
 ```
@@ -181,45 +196,231 @@ python manage.py shell
 
 #### Null versus blank
 
+```python
+from django.db import models
+
+class Author(models.Model):
+    ...
+    bio = models.TextField(null=True, blank=True)
+```
+
 #### auto_now versus auto_now_add
+
+```python
+from django.db import models
+
+class Blog(models.Model):
+    ...
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    ...
+```
 
 #### Avoid using raw SQL queries
 
+No code applicable to this section
+
 #### Using query expressions and database functions
+
+For query expressions, [check out](https://docs.djangoproject.com/en/stable/ref/models/expressions/)
+
+For database functions, [check out](https://docs.djangoproject.com/en/stable/ref/models/database-functions/)
 
 #### Use a reverse foreign key lookup
 
+Author and Blog model code as added in the previous section
+
+
+```python
+from django.db import models
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    bio = models.TextField()
+
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey('author.Author', on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+```
+
+Now to work with the model objects let us open Django shell using the following command:
+
+```bash
+python manage.py shell
+```
+
+Access an author object using via a blog object.
+```python
+from blog import models as blog_models
+author_obj = blog_models.Blog.objects.get(id=1).author
+author_obj
+```
+
+Fetch the blog information from an author object, we can use a reverse foreign key lookup
+```python
+from author import models as author_models
+author = author_models.Author.objects.get(email='john@gmail.com')
+all_blogs_by_an_author = author.blog_set.all()
+print(all_blogs_by_an_author)
+
+selected_blog = author.blog_set.filter(title='Python is cool')
+print(selected_blog)
+```
+
 ### How to get raw query from ORM
+
+Retrieving Queries for ORM using `.query`
+
+```python
+from author import models
+
+all_authors = models.Author.objects.filter(email__endswith='@gmail.com').values_list('name').query
+
+print(all_authors)
+```
+
+Retrieving Queries for ConnectionProxy
+
+```python
+from django.db import connection
+from author import models
+
+author_count = models.Author.objects.filter(email='a').count()
+connection.queries[-1]
+```
 
 ### Normalization using Django ORM
 
+No code applicable to this section
+
 #### OneToOneField
+
+OneToOneField is like ForeignKey, with an additional constraint of unique=True on ForeignKey
+
+```python
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(Author, related_name='author_blogs', on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class CoverImage(models.Model):
+    image_link = models.URLField()
+    blog = models.OneToOneField(Blog, related_name='blog_ci', on_delete=models.PROTECT)
+```
 
 #### The ForeignKey field
 
+```python
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    bio = models.TextField()
+
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(Author, related_name='author_blogs', on_delete=models.PROTECT)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+```
 #### ManyToManyField
+
+Create a new model `Tag` and add the following code to the `blog/models.py` file
+
+```python
+class Tag(models.Model):
+    name = models.CharField(max_length=100)
+    
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(Author, related_name='author_blogs', on_delete=models.PROTECT)
+    tags = models.ManyToManyField(Tag, related_name='blog_tags')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+```
+
+Customizing ManyToManyField [for more info](https://docs.djangoproject.com/en/5.0/ref/models/fields/#django.db.models.ManyToManyField.through)
 
 ### Exploring on_delete options
 
+No code applicable to this section
+
 #### Using model inheritance
+
+No code applicable to this section
 
 ##### Using abstract base classes
 
+```python
+class BaseTimeStampModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        abstract = True
+
+
+class CoverImage(BaseTimeStampModel):
+    image_link = models.URLField()
+    blog = models.OneToOneField(Blog, related_name='blog_ci', on_delete=models.PROTECT)
+```
+
 ##### multi-table inheritance
+
+No code applicable to this section
 
 ##### Proxy models
 
+```python
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    bio = models.TextField()
+
+class BlogAuthor(Author):
+    class Meta:
+        proxy = True
+    
+    def perform_something(self):
+        pass
+```
+
 ## Understanding the crux of Django Migration
+
+No code applicable to this section
 
 ### Demythifying Django Migrations commands
 
+No code applicable to this section
+
 #### The makemigrations command
+
+```bash
+python manage.py startapp author
+python manage.py startapp blog
+```
+
+Note: After running above command at this point, this will create 0002 migrations files in migrations folder of author and blog app respectively, this happens due to examples in the book
 
 #### The migrate command
 
+No code applicable to this section
+
 ### Performing DB migrations like a pro
 
+No code applicable to this section
+
 #### Perform reverse migrations
+
+```shell
+python manage.py migrate blog 0001
+```
 
 #### Use Fake migration
 
@@ -238,12 +439,12 @@ class Author(models.Model):
         return self.name
 ```
 
-now run the following commands:
-
+Now run the following commands:
 ```bash
 python manage.py makemigrations
-python manage.py migrate author 0002 --fake
+python manage.py migrate author 0002 --fake  # note: always check for migration file no created by previous step
 ```
+
 We have now faked the migration. Now, if we run the migrate command again, it will not apply the migration.
 
 ```bash
@@ -257,43 +458,140 @@ python manage.py migrate author 0001 --fake
 ```
 #### Avoid custom migration for data migrations
 
+No code applicable to this section
+
 #### Create a system check on duplicate migrations
+
+No code applicable to this section
 
 #### Adding new fields
 
+No code applicable to this section
+
 ## Exploring Best Practices for working with models and ORM
+
+No code applicable to this section
 
 ### Use base models
 
+```python
+from django.db import models
+
+class TimeStampedBaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class DemoModel(TimeStampedBaseModel):
+    name = models.CharField(max_length=100)
+```
+
 ### Use timezone.now() for any DateTime related data
+
+Django `settings.py` have a `TIME_ZONE` config that we need to set.  [Learn more](https://docs.djangoproject.com/en/5.0/topics/i18n/timezones/)
 
 ### How to avoid circular dependency in models
 
+No code applicable to this section
+
 ### Define __str__ for all models
+
+```python
+from django.db import models
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    bio = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.name}-{self.id}'
+
+```
 
 ### Use custom model methods
 
+Take the example of the `Author` model, we can add a custom method to get the author's full name and a short bio.
+```python
+class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    bio = models.TextField()
+
+    def get_author_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+    def get_short_bio(self):
+        return f'{self.bio[:200]}...'
+```
 ### Keep the default primary key
+
+No code applicable to this section
 
 ### Use transactions
 
+```python
+from django.db import transaction
+def viewfunc(request):
+    # This code executes in autocommit mode (Django's default).
+    # do_db_stuff()
+    with transaction.atomic():
+        # This code executes inside a transaction.
+        pass
+        # do_more_db_stuff()
+        # do_one_more_db_stuff()
+```
+
 ### Avoid generic foreign keys
+
+No code applicable to this section
 
 ### Use finite state machines (FSMs)
 
+No code applicable to this section
+
 ### Break the model into packages
+
+No code applicable to this section
 
 ## Learning about Performance Optimization
 
+No code applicable to this section
+
 ### Demystifying performance using explain and analyze
+
+read the explain and analyze [more info](https://www.postgresql.org/docs/current/sql-explain.html)
 
 ### Using index
 
+```python
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    bio = models.TextField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['name']),
+        ]
+```
+
 ### Using Django ORM like a pro
+
+No code applicable to this section
 
 #### Exists versus count
 
+No code applicable to this section
+
 #### Taking advantage of the lazy loading of QuerySet
+
+No code applicable to this section
 
 #### Using select_related and prefetch_related
 
@@ -326,7 +624,7 @@ from author import models
 @database_debug
 def regular_query():
     blogs = models.Blog.objects.all()
-    return [blog.author.first_name for blog in blogs]
+    return [blog.author.name for blog in blogs]
 
 regular_query()
 
@@ -383,12 +681,33 @@ SELECT "author_author"."id", "author_author"."name", "author_author"."email", "a
 
 #### Avoid bulk_create and bulk_update
 
+learn more about bulk_create, [go to](https://docs.djangoproject.com/en/stable/ref/models/querysets/#bulk-create)
+
 #### Using get_or_create and update_or_create
+
+bulk_update, [go to](https://docs.djangoproject.com/en/stable/ref/models/querysets/#get-or-create)
 
 ### Database Connection configuration
 
+No code applicable to this section
+
 #### Using CONN_MAX_AGE
+
+Django for persistent connections, [go to](https://docs.djangoproject.com/en/stable/ref/databases/#persistent-connections)
 
 #### Using connect_timeout
 
+```python
+from django.db.backends.signals import connection_created
+from django.dispatch import receiver
+
+@receiver(connection_created)
+def setup_query_timeout(connection, **kwargs):
+    # Set Timeout for every statement as 60 seconds.
+    with connection.cursor() as cursor:
+        cursor.execute("set statement_timeout to 60000;")
+```
+
 ## Exploring Django Async ORM
+
+Python natively supports async-await: [more info](https://docs.python.org/3/library/asyncio-task.html)
