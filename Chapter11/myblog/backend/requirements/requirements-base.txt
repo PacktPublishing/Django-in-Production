@@ -1,4 +1,4 @@
-Django==5.0
+Django==5.0.1
 redis==5.0.1
 django-cacheops==7.0.2
 celery==5.3.6

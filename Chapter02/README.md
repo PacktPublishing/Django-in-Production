@@ -308,10 +308,10 @@ class Blog(models.Model):
     author = models.ForeignKey(Author, related_name='author_blogs', on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    cover_image = models.OneToOneField('CoverImage', related_name='blog_cover_image', on_delete=models.PROTECT)
 
 class CoverImage(models.Model):
     image_link = models.URLField()
-    blog = models.OneToOneField(Blog, related_name='blog_ci', on_delete=models.PROTECT)
 ```
 
 #### The ForeignKey field
@@ -368,7 +368,6 @@ class BaseTimeStampModel(models.Model):
 
 class CoverImage(BaseTimeStampModel):
     image_link = models.URLField()
-    blog = models.OneToOneField(Blog, related_name='blog_ci', on_delete=models.PROTECT)
 ```
 
 ##### multi-table inheritance

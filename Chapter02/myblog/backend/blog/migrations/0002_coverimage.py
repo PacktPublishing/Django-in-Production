@@ -18,7 +18,6 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('image_link', models.URLField()),
-                ('blog', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='blog_ci', to='blog.blog')),
             ],
             options={
                 'abstract': False,
