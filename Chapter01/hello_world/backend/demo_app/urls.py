@@ -12,6 +12,9 @@ urlpatterns = [
     path('custom-version/', views.DemoView.as_view()),
     path('another-custom-version/', views.AnotherView.as_view()),
 
+    # This is the new line we added for "Working with Views using DRF"-> "Function Based Views" section
+    path('hello-world-functional-view/', views.hello_world_functional_view),
+
     # This is the new line we added for "Working with Views using DRF"-> "Class Based Views" -> "APIView" section
     path('apiview-class/', views.DemoAPIView.as_view())
 ]
