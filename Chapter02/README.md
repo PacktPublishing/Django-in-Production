@@ -1,19 +1,69 @@
 # Chapter 2: Exploring Django ORM, Models and Migrations
 
 ## Table of contents
-* [Setting up postgreSQL with Django Project](#setting-up-postgresql-with-django-project)
+* [Technical requirements](#technical-requirements)
+* [Setting up PostgreSQL with a Django Project](#setting-up-postgresql-with-a-django-project)
+  * [Creating a PostgreSQL server](#creating-a-postgresql-server)
   * [Configuring Django with PostgreSQL](#configuring-django-with-postgresql)
-* [Using Models and Django ORM](#using-models-and-django-orm)
-  * [Basic ORM concepts](#basic-orm-concepts)
+* [Using models and Django ORM](#using-models-and-django-orm)
+    * [Adding Django models](#adding-django-models)
+    * [Basic ORM concepts](#basic-orm-concepts)
+        * [Null versus blank](#null-versus-blank) 
+        * [auto_now versus auto_now_add](#auto_now-versus-auto_now_add)
+        * [Avoid using raw SQL queries](#avoid-using-raw-sql-queries)
+        * [Using query expressions and database functions](#using-query-expressions-and-database-functions)
+        * [Use a reverse foreign key lookup](#use-a-reverse-foreign-key-lookup)
+    * [How to get raw query from ORM](#how-to-get-raw-query-from-orm)
+    * [Normalization using Django ORM](#normalization-using-django-orm)
+        * [OneToOneField](#onetoonefield)
+        * [The ForeignKey field](#the-foreignkey-field)
+        * [ManyToManyField](#manytomanyfield)
+    * [Exploring on_delete options](#exploring-on_delete-options)
+    * [Using model inheritance](#using-model-inheritance)
+        * [Using abstract base classes](#using-abstract-base-classes)
+        * [multi-table inheritance](#multi-table-inheritance)
+        * [Proxy models](#proxy-models)
 * [Understanding the crux of Django Migration](#understanding-the-crux-of-django-migration)
-  * [Performing DB migrations like a pro](#performing-db-migrations-like-a-pro)
-    * [Use Fake migration](#use-fake-migration)
+    * [Demythifying Django Migrations commands](#demythifying-django-migrations-commands)
+        * [The makemigrations command](#the-makemigrations-command)
+        * [The migrate command](#the-migrate-command)
+    * [Performing DB migrations like a pro](#performing-db-migrations-like-a-pro)
+        * [Perform reverse migrations](#perform-reverse-migrations)
+        * [Use Fake migration](#use-fake-migration)
+    * [Avoid custom migration for data migrations](#avoid-custom-migration-for-data-migrations)
+    * [Create a system check on duplicate migrations](#create-a-system-check-on-duplicate-migrations)
+    * [Adding new fields](#adding-new-fields)
+* [Exploring Best Practices for working with models and ORM](#exploring-best-practices-for-working-with-models-and-orm)
+    * [Use base models](#use-base-models)
+    * [Use timezone.now() for any DateTime related data](#use-timezonenow-for-any-datetime-related-data)
+    * [How to avoid circular dependency in models](#how-to-avoid-circular-dependency-in-models)
+    * [Define __str__ for all models](#define-__str__-for-all-models)
+    * [Use custom model methods](#use-custom-model-methods)
+    * [Keep the default primary key](#keep-the-default-primary-key)
+    * [Use transactions](#use-transactions)
+    * [Avoid generic foreign keys](#avoid-generic-foreign-keys)
+    * [Use finite state machines (FSMs)](#use-finite-state-machines-fsms)
+    * [Break the model into packages](#break-the-model-into-packages)
 * [Learning about Performance Optimization](#learning-about-performance-optimization)
-  * [Understanding Django ORM like a pro](#understanding-django-orm-like-a-pro)
+  * [Demystifying performance using explain and analyze](#demystifying-performance-using-explain-and-analyze)
+  * [Using index](#using-index)
+  * [Using Django ORM like a pro](#using-django-orm-like-a-pro)
+    * [Exists versus count](#exists-versus-count)
+    * [Taking advantage of the lazy loading of QuerySet](#taking-advantage-of-the-lazy-loading-of-queryset)
     * [Using select_related and prefetch_related](#using-select_related-and-prefetch_related)
+    * [Avoid bulk_create and bulk_update](#avoid-bulk_create-and-bulk_update)
+    * [Using get_or_create and update_or_create](#using-get_or_create-and-update_or_create)
+  * [Database Connection configuration](#database-connection-configuration)
+    * [Using CONN_MAX_AGE](#using-conn_max_age)
+    * [Using connect_timeout](#using-connect_timeout)
+* [Exploring Django Async ORM](#exploring-django-async-orm)
+* [Summary](#summary)
 
+## Technical requirements
 
-## Setting up postgreSQL with Django Project
+## Setting up PostgreSQL with a Django Project
+
+### Creating a PostgreSQL server
 
 ### Configuring Django with PostgreSQL
 
@@ -52,7 +102,7 @@ DATABASES = {
 ```
 Please note that the above configuration is for connecting to the PostgreSQL database hosted on [ElephantSQL](https://www.elephantsql.com/). You can create a free account on ElephantSQL and create a database instance. Once you create a database instance, you can get the connection details from the dashboard. And the credentials used above are just for demonstration purposes. You can use the credentials from your database instance.
 
-## Using Models and Django ORM
+## Using models and Django ORM
 
 ### Adding Django models
 Create new django apps using the following command:
@@ -129,9 +179,47 @@ you can use the Django shell. You can start the Django shell using the following
 python manage.py shell
 ```
 
+#### Null versus blank
+
+#### auto_now versus auto_now_add
+
+#### Avoid using raw SQL queries
+
+#### Using query expressions and database functions
+
+#### Use a reverse foreign key lookup
+
+### How to get raw query from ORM
+
+### Normalization using Django ORM
+
+#### OneToOneField
+
+#### The ForeignKey field
+
+#### ManyToManyField
+
+### Exploring on_delete options
+
+#### Using model inheritance
+
+##### Using abstract base classes
+
+##### multi-table inheritance
+
+##### Proxy models
+
 ## Understanding the crux of Django Migration
 
+### Demythifying Django Migrations commands
+
+#### The makemigrations command
+
+#### The migrate command
+
 ### Performing DB migrations like a pro
+
+#### Perform reverse migrations
 
 #### Use Fake migration
 
@@ -167,9 +255,45 @@ Now to revert the fake migrations
 ```bash
 python manage.py migrate author 0001 --fake
 ```
+#### Avoid custom migration for data migrations
+
+#### Create a system check on duplicate migrations
+
+#### Adding new fields
+
+## Exploring Best Practices for working with models and ORM
+
+### Use base models
+
+### Use timezone.now() for any DateTime related data
+
+### How to avoid circular dependency in models
+
+### Define __str__ for all models
+
+### Use custom model methods
+
+### Keep the default primary key
+
+### Use transactions
+
+### Avoid generic foreign keys
+
+### Use finite state machines (FSMs)
+
+### Break the model into packages
+
 ## Learning about Performance Optimization
 
-### Understanding Django ORM like a pro
+### Demystifying performance using explain and analyze
+
+### Using index
+
+### Using Django ORM like a pro
+
+#### Exists versus count
+
+#### Taking advantage of the lazy loading of QuerySet
 
 #### Using select_related and prefetch_related
 
@@ -257,4 +381,14 @@ SELECT "blog_blog"."id", "blog_blog"."title", "blog_blog"."content", "blog_blog"
 SELECT "author_author"."id", "author_author"."name", "author_author"."email", "author_author"."bio" FROM "author_author" WHERE "author_author"."id" IN (1, 2)
 ```
 
+#### Avoid bulk_create and bulk_update
 
+#### Using get_or_create and update_or_create
+
+### Database Connection configuration
+
+#### Using CONN_MAX_AGE
+
+#### Using connect_timeout
+
+## Exploring Django Async ORM
