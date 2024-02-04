@@ -126,3 +126,17 @@ class BlogCustom8Admin(admin.ModelAdmin):
             print(data.title)
 
 # admin.site.register(models.Blog, BlogCustom8Admin) # Uncomment this line to use BlogCustom8Admin
+
+
+class CoverImageAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(models.CoverImage, CoverImageAdmin)
+
+
+class TagAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(models.Tag, TagAdmin)

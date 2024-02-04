@@ -1,7 +1,6 @@
 Django==5.0.1
 djangorestframework==3.14.0
 psycopg2-binary==2.9.9
-python-social-auth
-redis
-django-cacheops
-factoryboy
+redis==5.0.1
+django-cacheops==7.0.2
+factory-boy==3.3.0

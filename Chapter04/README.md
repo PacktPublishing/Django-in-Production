@@ -169,6 +169,12 @@ admin.site.register(models.Blog, BlogCustom7Admin)
 
 ### Adding django-json-widget
 
+Install the package:
+```bash
+$ pip install django-json-widget
+```
+
+
 ### Using custom actions
 
 ```python

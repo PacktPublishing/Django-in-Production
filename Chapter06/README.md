@@ -53,7 +53,12 @@ cache.get('hello')
 
 Setup Redis with `django-cacheops` in Django project. 
 
-First, add `cacheops` to the INSTALLED_APPS list in the `settings.py` file
+Install django-cacheops using the following command
+```bash
+$ pip install django-cacheops
+```
+
+Now add `cacheops` to the INSTALLED_APPS list in the `settings.py` file
 ```python
 THIRD_PARTY_APPS = [ 
     ... 
