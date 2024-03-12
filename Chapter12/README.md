@@ -26,11 +26,17 @@
 
 ## Technical requirements
 
-[“Version Control with Git” by Udacity](https://www.udacity.com/course/version-control-with-git--ud123)  
+Here are the technical requirements for this chapter:
+- [“Version Control with Git” by Udacity](https://www.udacity.com/course/version-control-with-git--ud123)  
 
-[“Pro Git” by Scott Chacon and Ben Straub](https://git-scm.com/book/en/v2) 
+- [“Pro Git” by Scott Chacon and Ben Straub](https://git-scm.com/book/en/v2) 
 
-[“RY’s Git Tutorial” by Ryan Hodson](https://www.amazon.com/Rys-Git-Tutorial-Ryan-Hodson-ebook/dp/B00QFIA5OC) 
+- [“RY’s Git Tutorial” by Ryan Hodson](https://www.amazon.com/Rys-Git-Tutorial-Ryan-Hodson-ebook/dp/B00QFIA5OC)
+
+> [!NOTE]
+> 
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.
+
 
 
 ## Using GIT efficiently

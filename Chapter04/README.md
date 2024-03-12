@@ -22,6 +22,11 @@
   * [Using Permissions for Django Admin](#using-permissions-for-django-admin)
 * [Creating Custom Management Commands](#creating-custom-management-commands)
 
+## Technical requirements
+
+> [!NOTE]
+> 
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.
 
 
 ## Exploring Django Admin

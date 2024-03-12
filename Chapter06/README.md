@@ -18,6 +18,12 @@
 > 
 > To get a basic understanding of Redis one can follow the official documentation of Redis or take one of the Redis courses available. [Redis University](https://university.redis.com/)
 > Python official documentation has a fairly simple guide to learning more about the built-in logging module. [Python documentation](https://docs.python.org/3/library/logging.html )
+> 
+
+> [!NOTE]
+> 
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.
+
 
 ## Caching with Django Cache
 

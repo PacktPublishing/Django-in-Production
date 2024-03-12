@@ -66,3 +66,8 @@ With the following software and hardware list you can run all code files present
 **Arghya(argo) Saha**
 is a software developer with 8+ years of experience and has been working with Django since 2015. Apart from Django, he is proficient in JavaScript, ReactJS, Node.js, Postgres, AWS, and several other technologies. He has worked with multiple start-ups, such as Postman and HealthifyMe, among others, to build applications at scale. He currently works at Abnormal Security as a senior Site Reliability Engineer to explore his passion in the infrastructure domain.
 In his spare time, he writes tech blogs. He is also an adventurous person who has done multiple Himalayan treks and is an endurance athlete with multiple marathons and triathlons under his belt.
+
+## For doubts and feedback
+> [!NOTE]
+> 
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.

@@ -35,6 +35,12 @@
 
 > [!NOTE]
 > Please note this chapter uses AWS and github. AWS and github continuously changes their UI and adds new feature, so it can be possible that the UI might be different from the screenshots in the book. Please use the latest UI and follow the steps mentioned in the book.
+> The code examples added in this chapter are tested with MacOS and Linux based systems. If you are using Windows, though the code should work seamlessly for Windows systems but you might need to refer to the official documentation for minor changes needed.
+
+> [!NOTE]
+> 
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.
+
 
 ## Learning the Basics of AWS
 [AWS Account](https://aws.amazon.com)

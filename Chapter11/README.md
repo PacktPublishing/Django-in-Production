@@ -18,6 +18,11 @@
 
 No code applicable to this section.
 
+> [!NOTE]
+> 
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.
+
+
 ## Learning the basics of Docker
 
 ### Installing Docker

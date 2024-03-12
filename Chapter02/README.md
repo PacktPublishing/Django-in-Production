@@ -69,7 +69,7 @@ If you have any doubts about any of the topics mentioned in this or other chapte
 
 > [!NOTE]
 > 
-> Here is the invite link for the Discord server, where you can reach can post any help and also reachout to me directly: https://discord.gg/FCrGUfmDyP
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.
 
 ## Setting up PostgreSQL with a Django Project
 

@@ -22,6 +22,13 @@
   * [Working with Generic Views](#working-with-generic-views)
   * [Filtering with SearchFilter and OrderingFilter](#filtering-with-searchfilter-and-orderingfilter)
 
+## Technical Requirements
+
+> [!NOTE]
+> 
+> Join the Discord server "[Django in Production](https://discord.gg/FCrGUfmDyP)" for direct support from the author as you follow the instructions in the book. Feel free to reach out for any help or clarifications needed. https://discord.gg/FCrGUfmDyP.
+
+
 ## Understanding the basics of DRF Serializers
 
 ## Using Model Serializers
